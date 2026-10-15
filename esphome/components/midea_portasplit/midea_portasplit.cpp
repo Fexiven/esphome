@@ -6,7 +6,7 @@
 
 namespace esphome::midea_portasplit {
 
-ESPHOME_LOG_TAG(TAG, "midea_portasplit");
+static const char *const TAG = "midea_portasplit";
 
 static constexpr uint32_t FOLLOWUP_TIMEOUT_ID = 0;
 
@@ -36,7 +36,12 @@ static constexpr uint8_t CAPS_0[] PROGMEM = {0xB5, 0x01, 0x00};
 static constexpr uint8_t CAPS_1[] PROGMEM = {0xB5, 0x01, 0x01, 0x01};
 
 // Two's complement of the sum of all bytes after the 0xAA start marker.
-static uint8_t checksum(const uint8_t *frame, size_t len) { return (uint8_t) -sum_bytes(frame + 1, len - 1); }
+static uint8_t checksum(const uint8_t *frame, size_t len) {
+  uint8_t sum = 0;
+  for (size_t i = 1; i < len; i++)
+    sum += frame[i];
+  return (uint8_t) -sum;
+}
 
 static uint8_t climate_mode_to_midea(climate::ClimateMode mode) {
   switch (mode) {
